@@ -34,7 +34,7 @@ loginS3 store =
 
 login' :: Address -> Email -> Password -> AWS (Maybe SessionId)
 login' store e passIn = do
-  p' <- S3.read (store /// Key "user" // Key (renderEmail e) // Key "password")
+  p' <- S3.read (store /// passwordKey e)
   if fmap Password p' /= Just passIn then
     pure Nothing
   else do
@@ -51,6 +51,10 @@ getSession' store s =
   fmap Email <$> S3.read (store /// sessionKey s)
 
 -----------------------
+
+passwordKey :: Email -> Key
+passwordKey e =
+  Key "user" // Key (renderEmail e) // Key "password"
 
 sessionKey :: SessionId -> Key
 sessionKey s =
