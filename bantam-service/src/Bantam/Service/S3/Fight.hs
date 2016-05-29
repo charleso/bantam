@@ -29,6 +29,9 @@ fightS3 genIO store =
     (updateLemma' store)
     (allowUserLemma' store)
     (hasUserLemma' store)
+    (inboxLemmas' store)
+    (hasInboxLemma' store)
+    (approveLemma' store)
 
 -----------------------
 
@@ -69,6 +72,19 @@ hasUserLemma' :: Address -> FightId -> Email -> LemmaId -> AWS Bool
 hasUserLemma' store fid email lid =
   S3.exists (store /// userLemmaKey fid email lid)
 
+inboxLemmas' :: Address -> FightId -> Email -> AWS [LemmaId]
+inboxLemmas' store fid email = do
+  ls <- S3.list (store /// inboxLemmasKey fid email)
+  pure . fmap LemmaId . catMaybes . fmap (S3.basename . S3.key) $ ls
+
+hasInboxLemma' :: Address -> FightId -> Email -> LemmaId -> AWS Bool
+hasInboxLemma' store fid email lid =
+  S3.exists (store /// inboxLemmaKey fid email lid)
+
+approveLemma' :: Address -> FightId -> LemmaId -> Email -> AWS ()
+approveLemma' store fid lid email =
+  void $ S3.writeWithMode S3.Overwrite (store /// reviewLemmaKey fid lid email) ""
+
 -----------------------
 
 currentKey :: Key
@@ -94,6 +110,18 @@ userLemmasKey fid email =
 userLemmaKey :: FightId -> Email -> LemmaId -> Key
 userLemmaKey fid email lid =
   userLemmasKey fid email // Key (renderLemmaId lid)
+
+inboxLemmasKey :: FightId -> Email -> Key
+inboxLemmasKey fid email =
+  fightKey fid // Key "fighter" // Key (renderEmail email) // Key "inbox"
+
+inboxLemmaKey :: FightId -> Email -> LemmaId -> Key
+inboxLemmaKey fid email lid =
+  inboxLemmasKey fid email // Key (renderLemmaId lid)
+
+reviewLemmaKey :: FightId -> LemmaId -> Email -> Key
+reviewLemmaKey fid lid email =
+  fightKey fid // Key "review" // Key (renderLemmaId lid) // Key (renderEmail email)
 
 -----------------------
 

@@ -5,6 +5,7 @@ module Bantam.Service.Resource.Fight (
   , fightResource
   , lemmasResource
   , lemmaResource
+  , reviewResource
   ) where
 
 import           Bantam.Service.Api
@@ -45,16 +46,18 @@ fightsResource fightService _email req =
       return $
         halt HTTP.status405 Empty
 
-fightResource :: MonadIO m => Fight m -> FightId -> Email -> Resource m
+fightResource :: (Applicative m, MonadIO m) => Fight m -> FightId -> Email -> Resource m
 fightResource fightService fightId email req = do
   accept <- hoistEither $ lookupAccept req contentTypesProvidedView
   lift $ case requestMethod req of
     "GET" -> do
-      ls <- userLemmas fightService fightId email
+      (ls, inbox) <- (,)
+        <$> userLemmas fightService fightId email
+        <*> inboxLemmas fightService fightId email
       return
         . halt HTTP.status200
         . view accept (renderFightId fightId <> " - Fight")
-        $ fightView fightId ls
+        $ fightView fightId ls inbox
     _ ->
       return $
         halt HTTP.status405 Empty
@@ -89,10 +92,10 @@ lemmasResource fightService fightId email req = do
 lemmaResource :: MonadIO m => Fight m -> FightId -> LemmaId -> Email -> Resource m
 lemmaResource fightService fightId lemmaId email req = do
   accept <- hoistEither $ lookupAccept req contentTypesProvidedView
+  forbiddenB $ hasUserLemma fightService fightId email lemmaId
   case requestMethod req of
     "POST" -> do
       contentType <- hoistEither $ lookupContentType req contentTypesAcceptedForm
-      forbiddenB $ hasUserLemma fightService fightId email lemmaId
       m <- case contentType of
         FormUrlEncoded -> do
           f <- liftIO $ parseFormData req
@@ -105,12 +108,31 @@ lemmaResource fightService fightId lemmaId email req = do
           updateLemma fightService fightId lemmaId l
           return $ redirect fightPath fightId
     "GET" -> do
-      forbiddenB $ hasUserLemma fightService fightId email lemmaId
       lemma <- forbidden $ getLemma fightService fightId lemmaId
       return
         . halt HTTP.status200
         . view accept (renderLemmaId lemmaId <> " - " <> renderFightId fightId <> " - Fight")
         $ lemmaView fightId (Just (lemmaId, lemma))
+    _ ->
+      return $
+        halt HTTP.status405 Empty
+
+reviewResource :: MonadIO m => Fight m -> FightId -> LemmaId -> Email -> Resource m
+reviewResource fightService fightId lemmaId email req = do
+  accept <- hoistEither $ lookupAccept req contentTypesProvidedView
+  forbiddenB $ hasInboxLemma fightService fightId email lemmaId
+  case requestMethod req of
+    "POST" -> do
+      _ <- hoistEither $ lookupContentType req contentTypesAcceptedForm
+      lift $ do
+        approveLemma fightService fightId lemmaId email
+        return $ redirect fightPath fightId
+    "GET" -> do
+      lemma <- forbidden $ getLemma fightService fightId lemmaId
+      return
+        . halt HTTP.status200
+        . view accept (renderLemmaId lemmaId <> " - Review - " <> renderFightId fightId <> " - Fight")
+        $ reviewView fightId lemmaId lemma
     _ ->
       return $
         halt HTTP.status405 Empty

@@ -39,7 +39,7 @@ bantamService env loginService fightService =
     (bantamRoutes loginService fightService)
     (\_ -> left NotFound)
 
-bantamRoutes :: MonadIO m => Login m -> Fight m -> RoutingSpec (Resource m) ()
+bantamRoutes :: (Applicative m, MonadIO m) => Login m -> Fight m -> RoutingSpec (Resource m) ()
 bantamRoutes loginService fightService = do
   loginPath @> loginResource loginService
   root @> secure loginService (fightsResource fightService)
@@ -48,3 +48,4 @@ bantamRoutes loginService fightService = do
   fightPath #> (\fid -> secure loginService (fightResource fightService fid))
   lemmasPath #> (\fid -> secure loginService (lemmasResource fightService fid))
   lemmaPath #> (\(fid, lid) -> secure loginService (lemmaResource fightService fid lid))
+  reviewPath #> (\(fid, lid) -> secure loginService (reviewResource fightService fid lid))
