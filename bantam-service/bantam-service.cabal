@@ -1,0 +1,91 @@
+name:                  bantam-service
+version:               0.0.1
+license:               AllRightsReserved
+author:                Charles O'Farrell <charleso@charleso.org>
+maintainer:            Charles O'Farrell <charleso@charleso.org>
+copyright:             (c) 2016 Charles O'Farrell.
+synopsis:              bantam-service
+category:              System
+cabal-version:         >= 1.8
+build-type:            Custom
+description:           bantam-service
+
+library
+  build-depends:
+                      base                            >= 3          && < 5
+                    , ambiata-mismi-core
+                    , ambiata-mismi-s3
+                    , ambiata-p
+                    , ambiata-tinfoil
+                    , ambiata-x-eithert
+                    , base16-bytestring               == 0.1.*
+                    , blaze-html                      == 0.8.*
+                    , bytestring                      == 0.10.*
+                    , cookie                          == 0.4.*
+                    , http-types                      == 0.8.*
+                    , http-media                      == 0.6.*
+                    , mwc-random                      == 0.13.*
+                    , portmanteau-core
+                    , portmanteau-lens
+                    , semigroups                      == 0.16.*
+                    , text                            == 1.2.*
+                    , time                            == 1.4.*
+                    , transformers                    >= 0.4        && < 0.6
+                    , wai                             == 3.0.*
+                    , wai-extra                       == 3.0.*
+                    , webship-http
+                    , webship-path
+                    , webship-route
+                    , webship-wai
+
+  ghc-options:
+                    -Wall
+
+  hs-source-dirs:
+                    src
+
+  exposed-modules:
+                      Bantam.Service
+                      Bantam.Service.Api
+                      Bantam.Service.Api.Fight
+                      Bantam.Service.Api.Login
+                      Bantam.Service.Data
+                      Bantam.Service.Http
+                      Bantam.Service.Path
+                      Bantam.Service.Resource.Fight
+                      Bantam.Service.Resource.Login
+                      Bantam.Service.Resource.Session
+                      Bantam.Service.S3.Fight
+                      Bantam.Service.S3.Login
+                      Bantam.Service.View
+                      Bantam.Service.View.Error
+                      Bantam.Service.View.Fight
+                      Bantam.Service.View.Frame
+                      Bantam.Service.View.Login
+                      Bantam.Service.Wai.Cookie
+                      Bantam.Service.Wai.Form
+                      Bantam.Service.Webship
+
+
+executable bantam-service
+  ghc-options:
+                    -Wall -threaded -O2
+                    -rtsopts -with-rtsopts "-T -N"
+
+  hs-source-dirs:   gen
+
+  main-is:
+                    ../main/bantam-service.hs
+
+  build-depends:
+                      base
+                    , ambiata-mismi-core
+                    , ambiata-mismi-s3
+                    , ambiata-p
+                    , ambiata-x-eithert
+                    , bantam-service
+                    , mwc-random
+                    , text
+                    , transformers
+                    , wai-extra
+                    , warp                            == 3.0.*
