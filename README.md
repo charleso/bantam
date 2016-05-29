@@ -1,6 +1,8 @@
 Bantam
 ======
 
+[![Build Status](https://travis-ci.org/charleso/bantam.svg?branch=master)](https://travis-ci.org/charleso/bantam)
+
 > 1. small or miniature chickens or ducks
 >
 > 2. a weight class in boxing and mixed martial arts
