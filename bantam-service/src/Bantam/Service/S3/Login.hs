@@ -37,10 +37,14 @@ login' store e passIn = do
   p' <- S3.read (store /// passwordKey e)
   if fmap Password p' /= Just passIn then
     pure Nothing
-  else do
-    s <- liftIO newSession
-    S3.writeOrFail (store /// sessionKey s) (renderEmail e)
-    pure $ Just s
+  else
+    Just <$> newSession' store e
+
+newSession' :: Address -> Email -> AWS SessionId
+newSession' store e = do
+  s <- liftIO newSession
+  S3.writeOrFail (store /// sessionKey s) (renderEmail e)
+  pure s
   where
     newSession :: IO SessionId
     newSession =
