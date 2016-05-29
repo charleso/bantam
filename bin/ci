@@ -1,0 +1,24 @@
+#!/bin/sh -eu
+
+export LC_COLLATE=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+git submodule init
+git submodule sync
+git submodule update
+
+MODULES=$(ls */*.cabal)
+
+for x in $MODULES; do
+    (
+        cd $(dirname $x)
+        CABAL=./mafia
+        $CABAL update || exit $?
+        $CABAL build || exit $?
+        $CABAL testci || exit $?
+
+        if [ "${BENCH:-}" = "true" ]; then
+            $CABAL bench
+        fi
+    )
+done
