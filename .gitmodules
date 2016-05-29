@@ -1,0 +1,24 @@
+[submodule "lib/p"]
+	path = lib/p
+	url = https://github.com/ambiata/p.git
+[submodule "lib/webship"]
+	path = lib/webship
+	url = https://github.com/charleso/webship.git
+[submodule "lib/portmanteau"]
+	path = lib/portmanteau
+	url = https://github.com/charleso/portmanteau.git
+[submodule "lib/mismi"]
+	path = lib/mismi
+	url = https://github.com/ambiata/mismi.git
+[submodule "lib/x"]
+	path = lib/x
+	url = https://github.com/ambiata/x.git
+[submodule "lib/twine"]
+	path = lib/twine
+	url = https://github.com/ambiata/twine.git
+[submodule "lib/disorder"]
+	path = lib/disorder
+	url = https://github.com/ambiata/disorder.hs.git
+[submodule "lib/tinfoil"]
+	path = lib/tinfoil
+	url = https://github.com/ambiata/tinfoil.git
