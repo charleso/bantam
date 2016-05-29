@@ -18,4 +18,7 @@ data Fight m =
     , updateLemma :: FightId -> LemmaId -> Lemma -> m ()
     , allowUserLemma :: FightId -> Email -> LemmaId -> m ()
     , hasUserLemma :: FightId -> Email -> LemmaId -> m Bool
+    , inboxLemmas :: FightId -> Email -> m [LemmaId]
+    , hasInboxLemma :: FightId -> Email -> LemmaId -> m Bool
+    , approveLemma :: FightId -> LemmaId -> Email -> m ()
     }

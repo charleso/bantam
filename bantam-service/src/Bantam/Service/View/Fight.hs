@@ -3,6 +3,7 @@
 module Bantam.Service.View.Fight (
     fightView
   , lemmaView
+  , reviewView
   ) where
 
 import           Bantam.Service.Data
@@ -15,8 +16,8 @@ import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as HA
 
 
-fightView :: FightId -> [LemmaId] -> Html
-fightView fid lemmas =
+fightView :: FightId -> [LemmaId] -> [LemmaId] -> Html
+fightView fid lemmas inbox =
   H.main $ do
     H.h1 "Lemmas"
     H.a ! HA.href (H.textValue $ encodedPathText lemmasPath fid) $
@@ -24,6 +25,11 @@ fightView fid lemmas =
     for_ lemmas $ \lid ->
       H.div $
         H.a ! HA.href (H.textValue $ encodedPathText lemmaPath (fid, lid)) $
+          toHtml (renderLemmaId lid)
+    H.h2 "Inbox"
+    for_ inbox $ \lid ->
+      H.div $
+        H.a ! HA.href (H.textValue $ encodedPathText reviewPath (fid, lid)) $
           toHtml (renderLemmaId lid)
 
 lemmaView :: FightId -> Maybe (LemmaId, Lemma) -> Html
@@ -45,3 +51,24 @@ lemmaView fid l =
 
       H.button ! HA.class_ "btn btn-default" ! HA.type_ "submit" $
         "Save"
+
+reviewView :: FightId -> LemmaId -> Lemma -> Html
+reviewView fid lid lemma =
+  H.main $ do
+    H.h1 "Lemma"
+    H.form
+      ! HA.action (H.textValue $ encodedPathText reviewPath (fid, lid))
+      ! HA.method "post"
+      $ do
+
+      H.label ! HA.for "lemma" $
+        "Lemma"
+      H.textarea
+        ! HA.class_ "form-control"
+        ! HA.name "lemma"
+        ! HA.disabled "true"
+        $
+        toHtml . renderLemma $ lemma
+
+      H.button ! HA.class_ "btn btn-default" ! HA.type_ "submit" $
+        "Approve"

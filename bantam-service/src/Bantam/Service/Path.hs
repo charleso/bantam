@@ -8,6 +8,7 @@ module Bantam.Service.Path (
   , fightPath
   , lemmasPath
   , lemmaPath
+  , reviewPath
   ) where
 
 import           Bantam.Service.Data
@@ -56,3 +57,7 @@ lemmasPath =
 lemmaPath :: Path (FightId, LemmaId)
 lemmaPath =
   lemmasPath |*| (_LemmaId |$| var)
+
+reviewPath :: Path (FightId, LemmaId)
+reviewPath =
+  fightPath |* seg "review" |*| (_LemmaId |$| var)
