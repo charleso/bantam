@@ -29,6 +29,7 @@ loginS3 store =
   Login
     (login' store)
     (getSession' store)
+    (createAccount' store)
 
 -----------------------
 
@@ -53,6 +54,16 @@ newSession' store e = do
 getSession' :: Address -> SessionId -> AWS (Maybe Email)
 getSession' store s =
   fmap Email <$> S3.read (store /// sessionKey s)
+
+createAccount' :: Address -> Email -> Password -> AWS (Maybe SessionId)
+createAccount' store e p = do
+  -- This will fail if the user already exists
+  r <- S3.write (store /// passwordKey e) (renderPassword p)
+  case r of
+    S3.WriteDestinationExists _ ->
+      pure Nothing
+    S3.WriteOk ->
+      Just <$> newSession' store e
 
 -----------------------
 
