@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Bantam.Service.Resource.Login (
     loginResource
+  , registrationResource
   ) where
 
 import           Bantam.Service.Api.Login
@@ -56,6 +57,36 @@ loginResource loginService req = do
     "GET" ->
       return $
         halt HTTP.status200 . view accept "Login" $ loginView Nothing
+    _ ->
+      return $
+        halt HTTP.status405 Empty
+
+registrationResource :: MonadIO m => Login m -> Resource m
+registrationResource loginService req = do
+  accept <- hoistEither $ lookupAccept req contentTypesProvidedView
+  case requestMethod req of
+    "POST" -> do
+      contentType <- hoistEither $ lookupContentType req contentTypesAcceptedForm
+      m <- case contentType of
+        FormUrlEncoded -> do
+          f <- liftIO $ parseFormData req
+          return $ (,)
+            <$> (Email <$> lookup "email" f)
+            <*> (Password <$> lookup "password" f)
+      lift $ case m of
+        Nothing ->
+          return . halt HTTP.status400 . view accept "Registration" $ registrationView Nothing
+        Just (e, p) -> do
+          s <- createAccount loginService e p
+          return $ case s of
+            Nothing ->
+              halt HTTP.status400 . view accept "Registration" $ registrationView (Just e)
+            Just s' ->
+              mapResponseHeaders (setCookieHeader (makeSimpleCookie sessionCookieKey (renderSessionId s')) :) $
+                redirect fightsPath ()
+    "GET" ->
+      return $
+        halt HTTP.status200 . view accept "Registration" $ registrationView Nothing
     _ ->
       return $
         halt HTTP.status405 Empty

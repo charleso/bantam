@@ -12,4 +12,5 @@ data Login m =
   Login {
       login :: Email -> Password -> m (Maybe SessionId)
     , getSession :: SessionId -> m (Maybe Email)
+    , createAccount :: Email -> Password -> m (Maybe SessionId)
     }

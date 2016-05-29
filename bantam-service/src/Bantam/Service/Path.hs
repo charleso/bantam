@@ -4,6 +4,7 @@ module Bantam.Service.Path (
     encodedPath
   , encodedPathText
   , loginPath
+  , registrationPath
   , fightsPath
   , fightPath
   , lemmasPath
@@ -41,6 +42,10 @@ encodedPathText p =
 loginPath :: Path ()
 loginPath =
   seg "login"
+
+registrationPath :: Path ()
+registrationPath =
+  seg "registration"
 
 fightsPath :: Path ()
 fightsPath =

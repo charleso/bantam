@@ -42,6 +42,7 @@ bantamService env loginService fightService =
 bantamRoutes :: (Applicative m, MonadIO m) => Login m -> Fight m -> RoutingSpec (Resource m) ()
 bantamRoutes loginService fightService = do
   loginPath @> loginResource loginService
+  registrationPath @> registrationResource loginService
   root @> secure loginService (fightsResource fightService)
   fightsPath @> secure loginService (fightsResource fightService)
   -- FIX Better combinators would help here

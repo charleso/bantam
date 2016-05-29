@@ -29,18 +29,23 @@ loginS3 store =
   Login
     (login' store)
     (getSession' store)
+    (createAccount' store)
 
 -----------------------
 
 login' :: Address -> Email -> Password -> AWS (Maybe SessionId)
 login' store e passIn = do
-  p' <- S3.read (store /// Key "user" // Key (renderEmail e) // Key "password")
+  p' <- S3.read (store /// passwordKey e)
   if fmap Password p' /= Just passIn then
     pure Nothing
-  else do
-    s <- liftIO newSession
-    S3.writeOrFail (store /// sessionKey s) (renderEmail e)
-    pure $ Just s
+  else
+    Just <$> newSession' store e
+
+newSession' :: Address -> Email -> AWS SessionId
+newSession' store e = do
+  s <- liftIO newSession
+  S3.writeOrFail (store /// sessionKey s) (renderEmail e)
+  pure s
   where
     newSession :: IO SessionId
     newSession =
@@ -50,7 +55,21 @@ getSession' :: Address -> SessionId -> AWS (Maybe Email)
 getSession' store s =
   fmap Email <$> S3.read (store /// sessionKey s)
 
+createAccount' :: Address -> Email -> Password -> AWS (Maybe SessionId)
+createAccount' store e p = do
+  -- This will fail if the user already exists
+  r <- S3.write (store /// passwordKey e) (renderPassword p)
+  case r of
+    S3.WriteDestinationExists _ ->
+      pure Nothing
+    S3.WriteOk ->
+      Just <$> newSession' store e
+
 -----------------------
+
+passwordKey :: Email -> Key
+passwordKey e =
+  Key "user" // Key (renderEmail e) // Key "password"
 
 sessionKey :: SessionId -> Key
 sessionKey s =
