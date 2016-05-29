@@ -32,7 +32,7 @@ main = do
   env <- orDie renderRegionError discoverAWSEnv
   genIO <- createSystemRandom
   Warp.runSettings
-    (Warp.setPort port (Warp.setHost "127.0.0.1" Warp.defaultSettings)) $
+    (Warp.setPort port Warp.defaultSettings) $
       logStdout $ bantamService
         env
         (loginS3 store)
