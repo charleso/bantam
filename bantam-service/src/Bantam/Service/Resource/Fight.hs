@@ -89,10 +89,10 @@ lemmasResource fightService fightId email req = do
 lemmaResource :: MonadIO m => Fight m -> FightId -> LemmaId -> Email -> Resource m
 lemmaResource fightService fightId lemmaId email req = do
   accept <- hoistEither $ lookupAccept req contentTypesProvidedView
+  forbiddenB $ hasUserLemma fightService fightId email lemmaId
   case requestMethod req of
     "POST" -> do
       contentType <- hoistEither $ lookupContentType req contentTypesAcceptedForm
-      forbiddenB $ hasUserLemma fightService fightId email lemmaId
       m <- case contentType of
         FormUrlEncoded -> do
           f <- liftIO $ parseFormData req
@@ -105,7 +105,6 @@ lemmaResource fightService fightId lemmaId email req = do
           updateLemma fightService fightId lemmaId l
           return $ redirect fightPath fightId
     "GET" -> do
-      forbiddenB $ hasUserLemma fightService fightId email lemmaId
       lemma <- forbidden $ getLemma fightService fightId lemmaId
       return
         . halt HTTP.status200
