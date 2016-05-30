@@ -70,5 +70,11 @@ reviewView fid lid lemma =
         $
         toHtml . renderLemma $ lemma
 
+      H.label ! HA.for "lemma" $
+        "Comment"
+      H.input
+        ! HA.class_ "form-control"
+        ! HA.name "review"
+
       H.button ! HA.class_ "btn btn-default" ! HA.type_ "submit" $
-        "Approve"
+        "Review"

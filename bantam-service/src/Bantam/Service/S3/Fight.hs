@@ -81,9 +81,9 @@ hasInboxLemma' :: Address -> FightId -> Email -> LemmaId -> AWS Bool
 hasInboxLemma' store fid email lid =
   S3.exists (store /// inboxLemmaKey fid email lid)
 
-approveLemma' :: Address -> FightId -> LemmaId -> Email -> AWS ()
-approveLemma' store fid lid email = do
-  void $ S3.writeWithMode S3.Overwrite (store /// reviewLemmaKey fid lid email) ""
+approveLemma' :: Address -> FightId -> LemmaId -> Email -> Review -> AWS ()
+approveLemma' store fid lid email review = do
+  void $ S3.writeWithMode S3.Overwrite (store /// reviewLemmaKey fid lid email) (renderReview review)
   S3.delete (store /// inboxLemmaKey fid email lid)
 
 -----------------------
