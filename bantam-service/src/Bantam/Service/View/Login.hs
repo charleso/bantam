@@ -42,12 +42,15 @@ loginView e =
           ! HA.name "password"
           ! HA.value ""
 
-      H.button ! HA.class_ "btn btn-default" ! HA.type_ "submit" $
-        "Login"
-
-      H.div $
-        H.a ! HA.href (H.textValue $ encodedPathText registrationPath ()) $
-          "Register"
+      H.div ! HA.class_ "form-gropu" $ do
+        H.div ! HA.class_ "pull-left" $
+          H.button ! HA.class_ "btn btn-primary" ! HA.type_ "submit" $
+            "Login"
+        H.div ! HA.class_ "pull-right" $ do
+          _ <- "Don't have a login?"
+          H.a ! HA.class_ "btn btn-link"
+            ! HA.href (H.textValue $ encodedPathText registrationPath ())
+            $ "Register"
 
 registrationView :: Maybe Email -> Html
 registrationView e =
@@ -79,5 +82,5 @@ registrationView e =
           ! HA.name "password"
           ! HA.value ""
 
-      H.button ! HA.class_ "btn btn-default" ! HA.type_ "submit" $
+      H.button ! HA.class_ "btn btn-primary" ! HA.type_ "submit" $
         "Register"

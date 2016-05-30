@@ -5,6 +5,8 @@ module Bantam.Service.Path (
   , encodedPathText
   , loginPath
   , registrationPath
+  , imgPath
+  , cssPath
   , fightsPath
   , fightPath
   , lemmasPath
@@ -66,3 +68,13 @@ lemmaPath =
 reviewPath :: Path (FightId, LemmaId)
 reviewPath =
   fightPath |* seg "review" |*| (_LemmaId |$| var)
+
+-- FIX Just use a raw Middleware
+
+imgPath :: Path Text
+imgPath =
+  seg "assets" *| seg "img" *| var
+
+cssPath :: Path Text
+cssPath =
+  seg "assets" *| seg "css" *| var

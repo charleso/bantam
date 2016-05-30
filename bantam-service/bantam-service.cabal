@@ -21,7 +21,9 @@ library
                     , base16-bytestring               == 0.1.*
                     , blaze-html                      == 0.8.*
                     , bytestring                      == 0.10.*
+                    , containers                      == 0.5.*
                     , cookie                          == 0.4.*
+                    , file-embed                      == 0.0.10.*
                     , http-types                      == 0.8.*
                     , http-media                      == 0.6.*
                     , mwc-random                      == 0.13.*
@@ -52,6 +54,7 @@ library
                       Bantam.Service.Data
                       Bantam.Service.Http
                       Bantam.Service.Path
+                      Bantam.Service.Resource.Assets
                       Bantam.Service.Resource.Fight
                       Bantam.Service.Resource.Login
                       Bantam.Service.Resource.Session

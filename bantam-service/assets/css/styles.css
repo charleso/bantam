@@ -1,0 +1,83 @@
+/* -----------------------
+base rules
+----------------------- */
+
+body {
+  margin:0;
+  padding: 0;
+  background: #000;
+}
+
+h1,
+h2 {
+  margin: 0 0 .5em;
+  font-weight: 600;
+  font-family: 'Candal', sans-serif;
+}
+
+/* -----------------------
+containers
+----------------------- */
+
+.container,
+.pane-header,
+.pane-footer {
+  background: #fff;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.container {
+  padding: 2em;
+  border-radius: 0 0 4px 4px;
+}
+
+.pane-footer {
+  height: 110px;
+  background: #000 url(/assets/img/coqfight-footer.png) no-repeat 100% 100%;
+}
+
+/* -----------------------
+buttons
+----------------------- */
+
+.btn-primary {
+  background-color: #a00000;
+  border-color: #8c0000;
+  font-weight: 400;
+  font-family: 'Candal', sans-serif;
+}
+
+.btn-primary:hover {
+  background-color: #810000;
+  border-color: #640000;
+}
+
+.btn-primary:focus {
+  background-color: #323232;
+  border-color: #000;
+}
+
+.btn-primary:focus:active,
+.btn-primary:active {
+  background-color: #d20000;
+  border-color: #b40000;
+}
+
+.btn-link {
+  color: #a00000;
+}
+
+.btn-link:hover {
+  color: #810000;
+}
+
+.btn-link:focus {
+  color: #323232;
+}
+
+.btn-link:active {
+  color: #d20000;
+}
+
+
