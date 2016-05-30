@@ -8,6 +8,7 @@ module Bantam.Service (
 
 import           Bantam.Service.Api
 import           Bantam.Service.Path
+import           Bantam.Service.Resource.Assets
 import           Bantam.Service.Resource.Fight
 import           Bantam.Service.Resource.Login
 import           Bantam.Service.Resource.Session
@@ -50,3 +51,6 @@ bantamRoutes loginService fightService = do
   lemmasPath #> (\fid -> secure loginService (lemmasResource fightService fid))
   lemmaPath #> (\(fid, lid) -> secure loginService (lemmaResource fightService fid lid))
   reviewPath #> (\(fid, lid) -> secure loginService (reviewResource fightService fid lid))
+
+  imgPath #> assetsResource
+  cssPath #> assetsResource

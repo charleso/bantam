@@ -19,18 +19,22 @@ import qualified Text.Blaze.Html5.Attributes as HA
 fightView :: FightId -> [LemmaId] -> [LemmaId] -> Html
 fightView fid lemmas inbox =
   H.main $ do
-    H.h1 "Lemmas"
-    H.a ! HA.href (H.textValue $ encodedPathText lemmasPath fid) $
+    H.a ! HA.class_ "btn btn-link pull-right"
+      ! HA.href (H.textValue $ encodedPathText lemmasPath fid) $
       "Create"
+    H.h1 "Lemmas"
     for_ lemmas $ \lid ->
-      H.div $
-        H.a ! HA.href (H.textValue $ encodedPathText lemmaPath (fid, lid)) $
+      H.div ! HA.class_ "form-group" $
+        H.a ! HA.class_ "btn btn-primary"
+          ! HA.href (H.textValue $ encodedPathText lemmaPath (fid, lid)) $
           toHtml (renderLemmaId lid)
-    H.h2 "Inbox"
-    for_ inbox $ \lid ->
-      H.div $
-        H.a ! HA.href (H.textValue $ encodedPathText reviewPath (fid, lid)) $
-          toHtml (renderLemmaId lid)
+    when (not . null $ inbox) $ do
+      H.h2 "Inbox"
+      for_ inbox $ \lid ->
+        H.div ! HA.class_ "form-group" $
+          H.a ! HA.class_ "btn btn-primary"
+            ! HA.href (H.textValue $ encodedPathText reviewPath (fid, lid)) $
+            toHtml (renderLemmaId lid)
 
 lemmaView :: FightId -> Maybe (LemmaId, Lemma) -> Html
 lemmaView fid l =
@@ -41,16 +45,18 @@ lemmaView fid l =
       ! HA.method "post"
       $ do
 
-      H.label ! HA.for "lemma" $
-        "Lemma"
-      H.textarea
-        ! HA.class_ "form-control"
-        ! HA.name "lemma"
-        $
-        maybe (pure ()) (toHtml . renderLemma . snd) l
+      H.div ! HA.class_ "form-group" $ do
+        H.label ! HA.for "lemma" $
+          "Lemma"
+        H.textarea
+          ! HA.class_ "form-control"
+          ! HA.name "lemma"
+          $
+          maybe (pure ()) (toHtml . renderLemma . snd) l
 
-      H.button ! HA.class_ "btn btn-default" ! HA.type_ "submit" $
-        "Save"
+      H.div ! HA.class_ "form-group" $
+        H.button ! HA.class_ "btn btn-primary" ! HA.type_ "submit" $
+          "Save"
 
 reviewView :: FightId -> LemmaId -> Lemma -> Html
 reviewView fid lid lemma =
@@ -61,20 +67,23 @@ reviewView fid lid lemma =
       ! HA.method "post"
       $ do
 
-      H.label ! HA.for "lemma" $
-        "Lemma"
-      H.textarea
-        ! HA.class_ "form-control"
-        ! HA.name "lemma"
-        ! HA.disabled "true"
-        $
-        toHtml . renderLemma $ lemma
+      H.div ! HA.class_ "form-group" $ do
+        H.label ! HA.for "lemma" $
+          "Lemma"
+        H.textarea
+          ! HA.class_ "form-control"
+          ! HA.name "lemma"
+          ! HA.disabled "true"
+          $
+          toHtml . renderLemma $ lemma
 
-      H.label ! HA.for "lemma" $
-        "Comment"
-      H.input
-        ! HA.class_ "form-control"
-        ! HA.name "review"
+      H.div ! HA.class_ "form-group" $ do
+        H.label ! HA.for "lemma" $
+          "Comment"
+        H.input
+          ! HA.class_ "form-control"
+          ! HA.name "review"
 
-      H.button ! HA.class_ "btn btn-default" ! HA.type_ "submit" $
-        "Review"
+      H.div ! HA.class_ "form-group" $
+        H.button ! HA.class_ "btn btn-primary" ! HA.type_ "submit" $
+          "Review"
