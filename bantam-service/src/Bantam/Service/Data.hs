@@ -9,6 +9,7 @@ module Bantam.Service.Data (
   , LemmaId (..)
   , _LemmaId
   , Lemma (..)
+  , Review (..)
   ) where
 
 import           P
@@ -48,4 +49,9 @@ makeIso ''LemmaId
 data Lemma =
   Lemma {
       renderLemma :: Text
+    } deriving (Eq, Show)
+
+data Review =
+  Review {
+      renderReview :: Text
     } deriving (Eq, Show)

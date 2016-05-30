@@ -121,18 +121,27 @@ reviewResource :: MonadIO m => Fight m -> FightId -> LemmaId -> Email -> Resourc
 reviewResource fightService fightId lemmaId email req = do
   accept <- hoistEither $ lookupAccept req contentTypesProvidedView
   forbiddenB $ hasInboxLemma fightService fightId email lemmaId
+  lemma <- forbidden $ getLemma fightService fightId lemmaId
   case requestMethod req of
     "POST" -> do
-      _ <- hoistEither $ lookupContentType req contentTypesAcceptedForm
-      lift $ do
-        approveLemma fightService fightId lemmaId email
-        return $ redirect fightPath fightId
+      contentType <- hoistEither $ lookupContentType req contentTypesAcceptedForm
+      m <- case contentType of
+        FormUrlEncoded -> do
+          f <- liftIO $ parseFormData req
+          return $
+            (Review <$> lookup "review" f)
+      lift $ case m of
+        Nothing ->
+          return . halt HTTP.status400 $ showReview accept lemma
+        Just review -> do
+          approveLemma fightService fightId lemmaId email review
+          return $ redirect fightPath fightId
     "GET" -> do
-      lemma <- forbidden $ getLemma fightService fightId lemmaId
-      return
-        . halt HTTP.status200
-        . view accept (renderLemmaId lemmaId <> " - Review - " <> renderFightId fightId <> " - Fight")
-        $ reviewView fightId lemmaId lemma
+      return . halt HTTP.status200 $ showReview accept lemma
     _ ->
       return $
         halt HTTP.status405 Empty
+  where
+    showReview accept lemma =
+      view accept (renderLemmaId lemmaId <> " - Review - " <> renderFightId fightId <> " - Fight")
+        $ reviewView fightId lemmaId lemma
