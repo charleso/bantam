@@ -49,7 +49,7 @@ lemmaView fid l =
         H.label ! HA.for "lemma" $
           "Lemma"
         H.textarea
-          ! HA.class_ "form-control"
+          ! HA.class_ "form-control lemma"
           ! HA.name "lemma"
           $
           maybe (pure ()) (toHtml . renderLemma . snd) l
@@ -71,7 +71,7 @@ reviewView fid lid lemma =
         H.label ! HA.for "lemma" $
           "Lemma"
         H.textarea
-          ! HA.class_ "form-control"
+          ! HA.class_ "form-control lemma"
           ! HA.name "lemma"
           ! HA.disabled "true"
           $
