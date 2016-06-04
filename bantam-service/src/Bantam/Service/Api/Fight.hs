@@ -21,4 +21,5 @@ data Fight m =
     , inboxLemmas :: FightId -> Email -> m [LemmaId]
     , hasInboxLemma :: FightId -> Email -> LemmaId -> m Bool
     , approveLemma :: FightId -> LemmaId -> Email -> Review -> m ()
+    , currentLemma :: FightId -> m (Maybe LemmaId)
     }

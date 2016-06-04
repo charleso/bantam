@@ -4,6 +4,7 @@ module Bantam.Service.Resource.Fight (
     fightsResource
   , fightResource
   , lemmasResource
+  , currentLemmaResource
   , lemmaResource
   , reviewResource
   ) where
@@ -89,10 +90,43 @@ lemmasResource fightService fightId email req = do
       return $
         halt HTTP.status405 Empty
 
-lemmaResource :: MonadIO m => Fight m -> FightId -> LemmaId -> Email -> Resource m
-lemmaResource fightService fightId lemmaId email req = do
+currentLemmaResource :: MonadIO m => Fight m -> FightId -> Resource m
+currentLemmaResource fightService fightId _req = do
+  lemmaId <- notFound $ currentLemma fightService fightId
+  return $ redirect lemmaPath (fightId, lemmaId)
+
+lemmaResource :: (Functor m, MonadIO m) => Fight m -> FightId -> LemmaId -> Maybe Email -> Resource m
+lemmaResource fightService fightId lemmaId email' req =
+  case email' of
+    Nothing -> do
+      forbiddenB $ (Just lemmaId ==) <$> currentLemma fightService fightId
+      lemmaReadResource fightService fightId lemmaId req
+    Just email -> do
+      owner <- lift $ hasUserLemma fightService fightId email lemmaId
+      case owner of
+        False -> do
+          forbiddenB $ (Just lemmaId ==) <$> currentLemma fightService fightId
+          lemmaReadResource fightService fightId lemmaId req
+        True ->
+          lemmaOwnerResource fightService fightId lemmaId email req
+
+lemmaReadResource :: (Functor m, MonadIO m) => Fight m -> FightId -> LemmaId -> Resource m
+lemmaReadResource fightService fightId lemmaId req = do
   accept <- hoistEither $ lookupAccept req contentTypesProvidedView
-  forbiddenB $ hasUserLemma fightService fightId email lemmaId
+  case requestMethod req of
+    "GET" -> do
+      lemma <- forbidden $ getLemma fightService fightId lemmaId
+      return
+        . halt HTTP.status200
+        . view accept (renderLemmaId lemmaId <> " - " <> renderFightId fightId <> " - Fight")
+        $ lemmaReadView lemma
+    _ ->
+      return $
+        halt HTTP.status405 Empty
+
+lemmaOwnerResource :: (Functor m, MonadIO m) => Fight m -> FightId -> LemmaId -> Email -> Resource m
+lemmaOwnerResource fightService fightId lemmaId _email req = do
+  accept <- hoistEither $ lookupAccept req contentTypesProvidedView
   case requestMethod req of
     "POST" -> do
       contentType <- hoistEither $ lookupContentType req contentTypesAcceptedForm

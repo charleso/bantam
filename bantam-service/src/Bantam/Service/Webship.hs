@@ -11,6 +11,7 @@ module Bantam.Service.Webship (
   , redirect
   , forbidden
   , forbiddenB
+  , notFound
   , halt
   , resourceToWaiT
   ) where
@@ -77,6 +78,10 @@ forbiddenB =
 forbidden :: Monad m => m (Maybe a) -> EitherT ResourceDenied m a
 forbidden =
   bind (hoistEither . maybeToRight Forbidden) . lift
+
+notFound :: Monad m => m (Maybe a) -> EitherT ResourceDenied m a
+notFound =
+  bind (hoistEither . maybeToRight NotFound) . lift
 
 redirect :: Path a -> a -> Response
 redirect p a =
