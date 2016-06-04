@@ -90,10 +90,10 @@ lemmasResource fightService fightId email req = do
       return $
         halt HTTP.status405 Empty
 
-currentLemmaResource :: MonadIO m => Fight m -> FightId -> Resource m
-currentLemmaResource fightService fightId _req = do
+currentLemmaResource :: (Functor m, MonadIO m) => Fight m -> FightId -> Resource m
+currentLemmaResource fightService fightId req = do
   lemmaId <- notFound $ currentLemma fightService fightId
-  return $ redirect lemmaPath (fightId, lemmaId)
+  lemmaReadResource fightService fightId lemmaId req
 
 lemmaResource :: (Functor m, MonadIO m) => Fight m -> FightId -> LemmaId -> Maybe Email -> Resource m
 lemmaResource fightService fightId lemmaId email' req =
