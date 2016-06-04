@@ -44,7 +44,14 @@ Website for managing Coq fights
 /fight/{fight}/review/{lemma}/{user}
 ```
 
-### V3 - Rounds
+### V4 - Current
+
+```
+/fight/{fight}/current-lemma
+  - {lemma}
+```
+
+### V5 - Rounds
 
 ```
 /user/{user}/fight/{fight}/round/{round}

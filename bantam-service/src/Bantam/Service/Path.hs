@@ -10,6 +10,7 @@ module Bantam.Service.Path (
   , fightsPath
   , fightPath
   , lemmasPath
+  , currentLemmaPath
   , lemmaPath
   , reviewPath
   ) where
@@ -60,6 +61,10 @@ fightPath =
 lemmasPath :: Path FightId
 lemmasPath =
   fightPath |* seg "lemma"
+
+currentLemmaPath :: Path FightId
+currentLemmaPath =
+  fightPath |* seg "current"
 
 lemmaPath :: Path (FightId, LemmaId)
 lemmaPath =

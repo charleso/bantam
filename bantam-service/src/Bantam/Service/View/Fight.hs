@@ -3,6 +3,7 @@
 module Bantam.Service.View.Fight (
     fightView
   , lemmaView
+  , lemmaReadView
   , reviewView
   ) where
 
@@ -57,6 +58,20 @@ lemmaView fid l =
       H.div ! HA.class_ "form-group" $
         H.button ! HA.class_ "btn btn-primary" ! HA.type_ "submit" $
           "Save"
+
+lemmaReadView :: Lemma -> Html
+lemmaReadView l =
+  H.main $ do
+    H.h1 "Lemma"
+
+    H.label ! HA.for "lemma" $
+      "Lemma"
+    H.textarea
+      ! HA.class_ "form-control lemma"
+      ! HA.name "lemma"
+      ! HA.disabled "true"
+      $
+      toHtml . renderLemma $ l
 
 reviewView :: FightId -> LemmaId -> Lemma -> Html
 reviewView fid lid lemma =

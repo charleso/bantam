@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Bantam.Service.Resource.Session (
     secure
+  , secure'
   , sessionCookieKey
   ) where
 

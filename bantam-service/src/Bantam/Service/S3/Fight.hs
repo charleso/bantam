@@ -32,6 +32,7 @@ fightS3 genIO store =
     (inboxLemmas' store)
     (hasInboxLemma' store)
     (approveLemma' store)
+    (currentLemma' store)
 
 -----------------------
 
@@ -86,6 +87,10 @@ approveLemma' store fid lid email review = do
   void $ S3.writeWithMode S3.Overwrite (store /// reviewLemmaKey fid lid email) (renderReview review)
   S3.delete (store /// inboxLemmaKey fid email lid)
 
+currentLemma' :: Address -> FightId -> AWS (Maybe LemmaId)
+currentLemma' store fid =
+  fmap (LemmaId . T.strip) <$> S3.read (store /// currentLemmaKey fid)
+
 -----------------------
 
 currentKey :: Key
@@ -123,6 +128,10 @@ inboxLemmaKey fid email lid =
 reviewLemmaKey :: FightId -> LemmaId -> Email -> Key
 reviewLemmaKey fid lid email =
   fightKey fid // Key "review" // Key (renderLemmaId lid) // Key (renderEmail email)
+
+currentLemmaKey :: FightId -> Key
+currentLemmaKey fid =
+  fightKey fid // Key "current-lemma"
 
 -----------------------
 
