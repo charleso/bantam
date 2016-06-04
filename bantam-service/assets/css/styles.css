@@ -80,4 +80,6 @@ buttons
   color: #d20000;
 }
 
-
+textarea.lemma {
+  height: 20em;
+}
