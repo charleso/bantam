@@ -33,10 +33,10 @@ assetsResource _ req = do
     Nothing ->
       left NotFound
     Just (etag, b) ->
-      return $ case lookup "If-None-Match" . requestHeaders $ req of
-        Just _ ->
+      return $ case (lookup "If-None-Match" . requestHeaders) req == Just etag of
+        True ->
           responseLBS HTTP.status304 [] ""
-        Nothing ->
+        False ->
           responseLBS HTTP.status200 [("ETag", etag)] $ b
 
 assets :: M.Map [Text] (ByteString, BSL.ByteString)
