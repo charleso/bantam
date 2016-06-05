@@ -39,7 +39,7 @@ Website for managing Coq fights
 ### V2 - Inbox
 
 ```
-/user/{user}/fight/{fight}/inbox/{lemma}
+/fight/{fight}/fighter/{user}/inbox/{lemma}
 
 /fight/{fight}/review/{lemma}/{user}
 ```
