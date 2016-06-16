@@ -69,7 +69,7 @@ lemmaReadView l =
     H.textarea
       ! HA.class_ "form-control lemma"
       ! HA.name "lemma"
-      ! HA.disabled "true"
+      ! HA.readonly "true"
       $
       toHtml . renderLemma $ l
 
@@ -88,7 +88,7 @@ reviewView fid lid lemma =
         H.textarea
           ! HA.class_ "form-control lemma"
           ! HA.name "lemma"
-          ! HA.disabled "true"
+          ! HA.readonly "true"
           $
           toHtml . renderLemma $ lemma
 
