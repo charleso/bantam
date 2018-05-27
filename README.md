@@ -16,8 +16,6 @@ Website for managing Coq fights
 
 ## Store
 
-### V0 - Login
-
 ```
 /current
   - {fight}
@@ -26,40 +24,33 @@ Website for managing Coq fights
 
 /session/{session}
   - {user}
-```
 
-### V1 - Lemmas
-
-```
 /fight/{fight}/lemma/{lemma}
 
 /fight/{fight}/fighter/{user}/lemma/{lemma}
-```
 
-### V2 - Inbox
-
-```
 /fight/{fight}/fighter/{user}/inbox/{lemma}
 
 /fight/{fight}/review/{lemma}/{user}
+
+/fight/{fight}/matches
 ```
 
-### V4 - Current
+### Matches format
+
+The matches file has the following (horrible) format.
 
 ```
-/fight/{fight}/current-lemma
-  - {lemma}
+player1|player2|game results|current lemma|upcoming lemmas
 ```
 
-### V5 - Rounds
+An example:
 
 ```
-/user/{user}/fight/{fight}/round/{round}
-
-/fight/{fight}/round/{round}/data
-  - title
-  - {lemma}
-/fight/{fight}/round/{round}/fighter/{user}
-/fight/{fight}/round/{round}/result
-  - {user}
+player1@foo.com|player2@bar.com|lemma1:D,lemma2:W1|lemma3|lemma4,lemma5
+player2@foo.com|player3@bar.com||||lemma6,lemma7
 ```
+
+- `D` is a draw
+- `W1` is a win for the first player
+- `W2` is a win for the second player
