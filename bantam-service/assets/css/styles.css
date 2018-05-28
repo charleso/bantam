@@ -19,11 +19,20 @@ h2 {
 containers
 ----------------------- */
 
+.pane-header {
+  background: #000;
+  text-align: center;
+}
+
+.container,
+.pane-footer {
+  background: #fff;
+}
+
 .container,
 .pane-header,
 .pane-footer {
-  background: #fff;
-  max-width: 600px;
+  /* max-width: 600px; */
   margin: 0 auto;
 }
 

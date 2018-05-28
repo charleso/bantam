@@ -6,8 +6,10 @@ module Bantam.Service.S3.Fight (
 
 import           Bantam.Service.Api.Fight
 import           Bantam.Service.Data
+import           Bantam.Service.Data.Fight
 
 import           Control.Monad.IO.Class (liftIO)
+import           Control.Monad.Trans.Class (lift)
 
 import qualified Data.Text as T
 
@@ -17,6 +19,8 @@ import qualified Mismi.S3 as S3
 import           P
 
 import           System.Random.MWC (GenIO, uniformR)
+
+import           X.Control.Monad.Trans.Either (EitherT, hoistEither)
 
 fightS3 :: GenIO -> Address -> Fight AWS
 fightS3 genIO store =
@@ -32,7 +36,7 @@ fightS3 genIO store =
     (inboxLemmas' store)
     (hasInboxLemma' store)
     (approveLemma' store)
-    (currentLemma' store)
+    (getMatches' store)
 
 -----------------------
 
@@ -87,9 +91,10 @@ approveLemma' store fid lid email review = do
   void $ S3.writeWithMode S3.Overwrite (store /// reviewLemmaKey fid lid email) (renderReview review)
   S3.delete (store /// inboxLemmaKey fid email lid)
 
-currentLemma' :: Address -> FightId -> AWS (Maybe LemmaId)
-currentLemma' store fid =
-  fmap (LemmaId . T.strip) <$> S3.read (store /// currentLemmaKey fid)
+getMatches' :: Address -> FightId -> EitherT MatchesError AWS Matches
+getMatches' store fid =
+  bind (maybe (pure emptyMatches) (hoistEither . first MatchesParseError . parseMatches)) . lift $
+    S3.read (store /// matchesKey fid)
 
 -----------------------
 
@@ -129,9 +134,9 @@ reviewLemmaKey :: FightId -> LemmaId -> Email -> Key
 reviewLemmaKey fid lid email =
   fightKey fid // Key "review" // Key (renderLemmaId lid) // Key (renderEmail email)
 
-currentLemmaKey :: FightId -> Key
-currentLemmaKey fid =
-  fightKey fid // Key "current-lemma"
+matchesKey :: FightId -> Key
+matchesKey fid =
+  fightKey fid // Key "matches"
 
 -----------------------
 

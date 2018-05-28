@@ -2,12 +2,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Bantam.Service.View.Fight (
     fightView
+  , matchesView
   , lemmaView
   , lemmaReadView
   , reviewView
   ) where
 
 import           Bantam.Service.Data
+import           Bantam.Service.Data.Fight
 import           Bantam.Service.Path
 
 import           P
@@ -17,12 +19,13 @@ import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as HA
 
 
-fightView :: FightId -> [LemmaId] -> [LemmaId] -> Html
-fightView fid lemmas inbox =
+fightView :: FightId -> Matches -> [LemmaId] -> [LemmaId] -> Html
+fightView fid m lemmas inbox =
   H.main $ do
     H.a ! HA.class_ "btn btn-link pull-right"
       ! HA.href (H.textValue $ encodedPathText lemmasPath fid) $
       "Create"
+    matchesTable fid m
     H.h1 "Lemmas"
     for_ lemmas $ \lid ->
       H.div ! HA.class_ "form-group" $
@@ -36,6 +39,58 @@ fightView fid lemmas inbox =
           H.a ! HA.class_ "btn btn-primary"
             ! HA.href (H.textValue $ encodedPathText reviewPath (fid, lid)) $
             toHtml (renderLemmaId lid)
+
+matchesView :: FightId -> Matches -> Html
+matchesView fid m =
+  H.main $
+    matchesTable fid m
+
+matchesTable :: FightId -> Matches -> Html
+matchesTable fid ms =
+  case matchesReady ms of
+    [] ->
+      mempty
+    ms' -> do
+      H.h1 "Matches"
+      H.table
+        ! HA.style "width: 100%;"
+        $ do
+        H.tr $ do
+          H.th "Player 1"
+          H.th "Player 2"
+          H.th "Draws"
+          H.th "Remaining"
+          H.th "Current"
+        for_ ms' $ \m ->
+          H.tr $ do
+            let
+              rl l =
+                H.a
+                  ! HA.href (H.textValue $ encodedPathText lemmaPath (fid, l)) $
+                  (toHtml . mconcat $ [renderLemmaId $ l, " "])
+              rp r h =
+                mconcat [
+                    toHtml $ renderEmail h
+                  , " ("
+                  , mconcat . with (matchGames m) $
+                      \(Game l r') -> if r == r' then rl l else ""
+                  , ")"
+                  ]
+            H.td $ rp Winner1 (matchPlayer1 m)
+            H.td $ rp Winner2 (matchPlayer2 m)
+            H.td . mconcat . with (matchGames m) $ \(Game l r) ->
+              case r of
+                Draw ->
+                  rl l
+                _ ->
+                  ""
+            -- Don't link to the lemmas, they're not public yet
+            H.td .  toHtml . renderIntegral . length $ matchUpcoming m
+            H.td $ case matchCurrent m of
+              Nothing ->
+                ""
+              Just c ->
+                rl c
 
 lemmaView :: FightId -> Maybe (LemmaId, Lemma) -> Html
 lemmaView fid l =

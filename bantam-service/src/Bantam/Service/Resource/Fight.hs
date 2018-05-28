@@ -29,7 +29,7 @@ import qualified Network.HTTP.Types as HTTP
 
 import           Webship.Wai (ResponseBody (..))
 
-import           X.Control.Monad.Trans.Either (hoistEither)
+import           X.Control.Monad.Trans.Either (hoistEither, runEitherT)
 
 
 fightsResource :: MonadIO m => Fight m -> Email -> Resource m
@@ -47,18 +47,25 @@ fightsResource fightService _email req =
       return $
         halt HTTP.status405 Empty
 
-fightResource :: (Applicative m, MonadIO m) => Fight m -> FightId -> Email -> Resource m
-fightResource fightService fightId email req = do
+fightResource :: (Applicative m, MonadIO m) => Fight m -> FightId -> Maybe Email -> Resource m
+fightResource fightService fightId email' req = do
   accept <- hoistEither $ lookupAccept req contentTypesProvidedView
   lift $ case requestMethod req of
     "GET" -> do
-      (ls, inbox) <- (,)
-        <$> userLemmas fightService fightId email
-        <*> inboxLemmas fightService fightId email
-      return
-        . halt HTTP.status200
-        . view accept (renderFightId fightId <> " - Fight")
-        $ fightView fightId ls inbox
+      mse <- runEitherT $ getMatches fightService fightId
+      case mse of
+        Left (MatchesParseError e) ->
+          pure . halt HTTP.status500 $ serverError e
+        Right ms ->
+          halt HTTP.status200 . view accept (renderFightId fightId <> " - Fight") <$>
+            case email' of
+              Nothing ->
+                pure $ matchesView fightId ms
+              Just email -> do
+                (ls, inbox) <- (,)
+                  <$> userLemmas fightService fightId email
+                  <*> inboxLemmas fightService fightId email
+                pure $ fightView fightId ms ls inbox
     _ ->
       return $
         halt HTTP.status405 Empty

@@ -52,6 +52,7 @@ library
                       Bantam.Service.Api.Fight
                       Bantam.Service.Api.Login
                       Bantam.Service.Data
+                      Bantam.Service.Data.Fight
                       Bantam.Service.Http
                       Bantam.Service.Path
                       Bantam.Service.Resource.Assets

@@ -47,7 +47,7 @@ bantamRoutes loginService fightService = do
   root @> secure loginService (fightsResource fightService)
   fightsPath @> secure loginService (fightsResource fightService)
   -- FIX Better combinators would help here
-  fightPath #> (\fid -> secure loginService (fightResource fightService fid))
+  fightPath #> (\fid -> secure' loginService (fightResource fightService fid))
   lemmasPath #> (\fid -> secure loginService (lemmasResource fightService fid))
   currentLemmaPath #> currentLemmaResource fightService
   lemmaPath #> (\(fid, lid) -> secure' loginService (lemmaResource fightService fid lid))
